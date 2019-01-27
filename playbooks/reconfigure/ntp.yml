@@ -1,0 +1,4 @@
+- hosts: dizp
+  roles:
+  - common/ntp
+

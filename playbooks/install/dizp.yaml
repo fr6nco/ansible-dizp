@@ -1,0 +1,14 @@
+- hosts: dizp
+  gather_facts: no
+  tasks:
+  - raw: apt-get install -y --force-yes -o "Acquire::http::Timeout=10" --no-upgrade python-apt 
+  tags: 
+  - initial
+  - install
+
+- hosts: dizp
+  roles:
+  - { role: common/admins, users: ['tbo',] }
+  - common/linux-server
+  # - common/linux-networking     #TODO: restart after running this item (or move higher)
+  - common/ntp

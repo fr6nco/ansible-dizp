@@ -1,0 +1,17 @@
+- hosts: linux-apt
+  environment: "{{ proxy_env }}"
+  gather_facts: no
+  tasks:
+  - raw: apt-get install -y --force-yes -o "Acquire::http::Timeout=10" --no-upgrade python-apt 
+
+- hosts: bsd
+  environment: "{{ proxy_env }}"
+  gather_facts: no
+  tasks:
+  - raw: pkg install -y python 
+
+- hosts: linux-yum
+  environment: "{{ proxy_env }}"
+  gather_facts: no
+  tasks:
+  - raw: yum install -y python 

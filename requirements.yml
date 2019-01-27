@@ -1,0 +1,3 @@
+- src: cloudalchemy.grafana
+- src: manala.apt
+- src: manala.influxdb
