@@ -1,0 +1,33 @@
+options {
+    directory "/var/cache/bind";
+
+    forwarders {
+{% for item in ns_forwarders %}
+        {{ item }};
+{% endfor %}
+    };
+
+    allow-query {
+        0.0.0.0/0;
+    };
+
+    allow-recursion {
+        127.0.0.1;
+{% for item in ns_recursion_trusted %}
+        {{ item }};
+{% endfor %}
+    };
+
+    dnssec-validation auto;
+
+    auth-nxdomain no;
+    listen-on-v6 { any; };
+    listen-on { 127.0.0.1; {{ dns_listen }}; };
+
+    notify-source {{ dns_listen }};
+    transfer-source {{ dns_listen }};
+};
+
+statistics-channels {
+    inet 127.0.0.1 port 8653 allow { 127.0.0.1; };
+};

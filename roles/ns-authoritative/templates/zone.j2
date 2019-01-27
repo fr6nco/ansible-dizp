@@ -1,0 +1,60 @@
+{% set zone = item %}
+; {{ custom_ansible_managed }}
+
+; ----------------------------------------------------------------------
+; Zone: {{ zone.name }}
+; ----------------------------------------------------------------------
+$TTL {{ zone.ttl }}
+$ORIGIN {{ zone.name }}.
+{{ "%-40s"|format("@") }} {{ "%-20s"|format("IN") }} {{ "%-20s"|format("SOA") }} {{ "%-20s"|format("") }} {{ zone.soa.ns }}. {{ zone.soa.contact }}. ({%- if zone_serial_numbers[zone.name] == "" -%}0000000000{%- else -%}{{ zone_serial_numbers[zone.name] }}{%- endif %} {{ zone.soa.refresh }} {{ zone.soa.retry }} {{ zone.soa.expiry }} {{ zone.soa.nxdomain_ttl }})
+{% for host in (groups['dns'] | sort) %}
+{{ "%-40s"|format("") }} {{ "%-20s"|format("IN") }} {{ "%-20s"|format("NS") }} {{ "%-20s"|format("") }} {{ host }}.
+{% endfor %}
+{%- if zone.records is defined -%}
+    {%- for record in zone.records -%}
+        {{ "%-40s"|format(record.name) }} {{ "%-20s"|format(record.ttl | default("IN")) }} {{ "%-20s"|format(record.type | upper) }} {{ "%-20s"|format(record.priority | default("")) }} {{ record.value }}
+    {% endfor -%}
+{%- endif -%}
+
+{%- if zone.sections is defined -%}
+    {% for section in zone.sections %}
+
+; ----------------------------------------------------------------------
+; Section: {{ section.name }}
+; ----------------------------------------------------------------------
+    {% if section.origin is defined %}
+$ORIGIN {{ section.origin }}.
+    {% else %}
+$ORIGIN {{ zone.name }}.
+    {% endif %}
+
+        {% if section.generate is defined %}
+            {%- if section.generate == "inventory_hosts" -%}
+                {%- for host in (groups.all | sort) -%}
+                    {%- if 'ns_host_records' in hostvars[host] -%}
+                        {%- for record in (hostvars[host].ns_host_records | selectattr("name", "match", "^.*" + (zone.name | replace('.', '\.') + "$"))) -%}
+                            {{ "%-40s"|format(record.name + ".") }} {{ "%-20s"|format("IN") }} {{ "%-20s"|format("A") }} {{ "%-20s"|format("") }} {{ record.address }}
+                        {% endfor -%}
+                    {%- endif %}
+                {% endfor -%}
+            {%- elif section.generate == "inventory_hosts_reverse" -%}
+                {%- for host in (groups.all | sort) -%}
+                    {%- if 'ns_host_records' in hostvars[host] -%}
+                        {%- for record in hostvars[host].ns_host_records -%}
+                            {%- if (record.reverse is not defined or record.reverse == True) and (record.address | regex_search(section.match)) -%}
+                                {{ "%-40s"|format((record.address.split('.') | list | reverse | list | join('.')) + '.in-addr.arpa.') }} {{ "%-20s"|format("IN") }} {{ "%-20s"|format("PTR") }} {{ "%-20s"|format("") }} {{ record.name }}.
+                            {% endif -%}
+                       {% endfor -%}
+                    {%- endif %}
+                {% endfor -%}
+            {%- endif -%}
+        {%- else -%}
+            {%- if section.records is defined -%}
+                {%- for record in section.records -%}
+                    {{ "%-40s"|format(record.name) }} {{ "%-20s"|format(record.ttl | default("IN")) }} {{ "%-20s"|format(record.type | upper) }} {{ "%-20s"|format(record.priority | default("")) }} {{ record.value }}
+                {% endfor -%}
+            {%- endif -%}
+        {%- endif -%}
+
+    {%- endfor -%}
+{%- endif -%}

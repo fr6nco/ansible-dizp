@@ -1,5 +1,5 @@
 user: "tbo"
 admin_email: "tomas.boros92@gmail.com"
 host_type: virtual
-
 root_dir: "{{ inventory_dir }}/"
+

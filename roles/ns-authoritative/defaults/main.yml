@@ -1,0 +1,5 @@
+---
+bind_file_attributes:
+  owner: bind
+  group: bind
+  mode: "0770"

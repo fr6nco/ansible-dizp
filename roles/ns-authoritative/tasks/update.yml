@@ -1,0 +1,116 @@
+---
+- name: get master zone serial numbers
+  become: yes
+  shell: "cat /etc/bind/zones/{{ item.name }}.db | sed -rn 's/^.*SOA.*\\(([0-9]+) .*/\\1/p'"
+  with_items: "{{ ns_zones | selectattr('slave_only', 'undefined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: "ns_role == 'master'"
+  changed_when: no
+  register: zone_serial_numbers_read
+
+- name: populate master zone serial numbers
+  set_fact:
+    zone_serial_numbers: "{{ zone_serial_numbers | default({}) | combine({ item.item.name: item.stdout }) }}"
+  with_items: "{{ zone_serial_numbers_read.results | selectattr('slave_only', 'undefined') | list }}"
+  loop_control:
+    label: "{{ item.item.name }}: {{ item.stdout | default('-') }}"
+  when: "ns_role == 'master'"
+
+- name: generate master zone files
+  become: yes
+  template:
+    src: zone.j2
+    dest: "/etc/bind/zones/{{ item.name }}.db"
+    lstrip_blocks: yes
+    owner: "{{ bind_file_attributes.owner }}"
+    group: "{{ bind_file_attributes.group }}"
+    mode: "{{ bind_file_attributes.mode }}"
+    validate: "/usr/sbin/named-checkzone {{ item.name }} %s"
+  with_items: "{{ ns_zones | selectattr('slave_only', 'undefined') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: "ns_role == 'master'"
+  notify: reload nameserver
+  register: forward_zones_changed_new
+
+- name: populate changed zones
+  set_fact:
+    zones_changed: "{{ zones_changed | default([]) | union(forward_zones_changed_new.results | default([])) | selectattr('changed', 'equalto', True) | map(attribute='item.name') | list }}"
+  when: "ns_role == 'master'"
+
+- name: generate new zone serial numbers
+  become: no
+  connection: local
+  shell: "node scripts/generate_zone_serial_number.js {{ zone_serial_numbers[item] }}"
+  args:
+    chdir: "{{ inventory_dir }}/roles/ns-authoritative"
+  with_items: "{{ zones_changed }}"
+  when: "ns_role == 'master'"
+  register: zones_new_serial_numbers_output
+
+- name: populate new zone serial numbers
+  set_fact:
+    zone_new_serial_numbers: "{{ zone_new_serial_numbers | default({}) | combine({ item.item: item.stdout }) }}"
+  with_items: "{{ zones_new_serial_numbers_output.results }}"
+  when: "ns_role == 'master'"
+  loop_control:
+    label: "{{ item.item }}: {{ item.stdout | default('-') }}"
+
+- name: apply new zone serial numbers
+  become: yes
+  replace:
+    path: "/etc/bind/zones/{{ item }}.db"
+    regexp: "\\((?:0000000000|{{ zone_serial_numbers[item] }}) "
+    replace: "({{ zone_new_serial_numbers[item] }} "
+  with_items: "{{ zones_changed }}"
+  when: "ns_role == 'master'"
+
+- name: backup bind zones configuration
+  become: yes
+  copy:
+    src: /etc/bind/named.conf.zones
+    dest: /tmp/named.conf.zones
+    remote_src: yes
+  changed_when: no
+  ignore_errors: yes
+
+- name: apply bind zones configuration
+  become: yes
+  template:
+    src: templates/named.conf.zones.j2
+    dest: /etc/bind/named.conf.zones
+    lstrip_blocks: yes
+    owner: "{{ bind_file_attributes.owner }}"
+    group: "{{ bind_file_attributes.group }}"
+    mode: "{{ bind_file_attributes.mode }}"
+  notify: reload nameserver
+
+- name: validate bind configuration
+  become: yes
+  command: /usr/sbin/named-checkconf /etc/bind/named.conf
+  ignore_errors: yes
+  register: bind_config_validate_check
+  changed_when: no
+
+- name: restore bind configuration
+  become: yes
+  copy:
+    src: /tmp/named.conf.zones
+    dest: /etc/bind/named.conf.zones
+    remote_src: yes
+  when: bind_config_validate_check.failed
+  ignore_errors: yes
+
+- name: delete bind configuration backup
+  become: yes
+  file:
+    path: /tmp/named.conf.zones
+    state: absent
+  changed_when: no
+  ignore_errors: yes
+
+- name: fail on broken configuration
+  fail:
+    msg: configuration validation failed - see errors above
+  when: bind_config_validate_check.failed

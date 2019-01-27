@@ -1,0 +1,33 @@
+---
+- name: install bind9 nameserver
+  become: yes
+  apt:
+    name: bind9
+    state: latest
+
+- name: create zones directory
+  become: yes
+  file:
+    path: /etc/bind/zones
+    state: directory
+    owner: "{{ bind_file_attributes.owner }}"
+    group: "{{ bind_file_attributes.group }}"
+    mode: "{{ bind_file_attributes.mode }}"
+
+- name: install main bind configuration
+  become: yes
+  template:
+    src: templates/named.conf.j2
+    dest: /etc/bind/named.conf
+    owner: "{{ bind_file_attributes.owner }}"
+    group: "{{ bind_file_attributes.group }}"
+    mode: "{{ bind_file_attributes.mode }}"
+
+- name: apply bind options configuration
+  become: yes
+  template:
+    src: templates/named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+    owner: "{{ bind_file_attributes.owner }}"
+    group: "{{ bind_file_attributes.group }}"
+    mode: "{{ bind_file_attributes.mode }}"

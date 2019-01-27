@@ -1,0 +1,55 @@
+// Master Zones
+{% for zone in (ns_zones | selectattr('slave_only', 'undefined') | list) -%}
+zone "{{ zone.name }}" in {
+  type {% if ns_role is defined and ns_role == "master" %}master{% else %}slave{% endif %};
+  file "/etc/bind/zones/{{ zone.name }}.db";
+  {% if ns_role is defined and ns_role == "master" %}
+  notify yes;
+  allow-transfer {
+    {% for host in groups['dns'] %}
+      {%- if hostvars[host].ns_role is defined and hostvars[host].ns_role == "slave" %}
+        {{ hostvars[host].ns_nat_ip | default(hostvars[host].dns_listen) }};
+      {% endif -%}
+    {% endfor %}
+  };
+  {% else %}
+  masters {
+    {% for host in groups['dns'] %}
+      {%- if hostvars[host].ns_role is defined and hostvars[host].ns_role == "master" %}
+        {{ hostvars[host].ns_nat_ip | default(hostvars[host].dns_listen) }};
+      {% endif -%}
+    {% endfor %}
+  };
+  allow-transfer {
+    {% for host in groups['dns'] %}
+      {%- if hostvars[host].ns_role is defined and hostvars[host].ns_role == "master" %}
+        {{ hostvars[host].ns_nat_ip | default(hostvars[host].dns_listen) }};
+      {% endif -%}
+    {% endfor %}
+  };
+  {% endif %}
+  zone-statistics yes;
+};
+
+{% endfor %}
+
+// Slave Zones
+{% for zone in ns_zones -%}
+{%- if zone.slave_only is defined and zone.slave_only == True and inventory_hostname in zone.slave_hosts -%}
+zone "{{ zone.name }}" in {
+  type slave;
+  file "/etc/bind/zones/{{ zone.name }}.slave.db";
+  masters {
+    {% for host in zone.masters %}
+      {{ host }};
+    {% endfor %}
+  };
+  allow-transfer {
+    {% for host in zone.masters %}
+      {{ host }};
+    {% endfor %}
+  };
+};
+
+{% endif %}
+{% endfor %}

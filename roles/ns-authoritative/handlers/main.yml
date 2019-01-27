@@ -1,0 +1,14 @@
+---
+- name: restart bind9
+  become: yes
+  systemd:
+    name: bind9
+    state: restarted
+  listen: restart nameserver
+
+- name: reload bind9
+  become: yes
+  systemd:
+    name: bind9
+    state: reloaded
+  listen: reload nameserver
