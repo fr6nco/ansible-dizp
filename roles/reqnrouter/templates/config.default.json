@@ -1,0 +1,21 @@
+{
+    "http": {
+        "host": "{{listen_ip}}",
+        "port": {{listen_port}},
+        "domain": "{{domain}}"
+    },
+    "connector": {
+        "ip": "{{connector_ip}}",
+        "port": {{connector_port}},
+        "url": "cdnhandler/ws"
+    },
+    "request_router": {
+        "se_connection_limit": {{connection_limit}}
+    },
+    "logging": {
+        "level": "info"
+    },
+    "api": {
+        "port": 3000
+    }
+}

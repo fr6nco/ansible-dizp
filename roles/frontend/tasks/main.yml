@@ -1,0 +1,33 @@
+
+- name: install dependencies
+  package:
+    name: apache2
+    state: present
+
+- name: "Copy the built frontend archive to the destination"
+  unarchive:
+    src: cdnfe.tar.gz
+    dest: /var/www
+    owner: www-data
+    group: www-data
+
+- name: "change owner of /var/www/cdNfe folder"
+  file:
+    dest: /var/www/cdNfe
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: "Create config file for apache"
+  template:
+    src: 001-frontend.conf
+    dest: /etc/apache2/sites-available/001-cdnfe.conf
+    mode: 0644
+  notify: reload webserver frontend
+
+- name: "Create symlink to the sites-enabled"
+  file:
+    dest: /etc/apache2/sites-enabled/001-cdnfe.conf
+    src: /etc/apache2/sites-available/001-cdnfe.conf
+    state: link
+  notify: reload webserver frontend

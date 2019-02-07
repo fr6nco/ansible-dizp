@@ -1,0 +1,6 @@
+
+- name: 'Restart supervisord service' 
+  service:
+    name: supervisor
+    state: restarted
+  listen: restart supervisor

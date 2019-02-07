@@ -1,0 +1,39 @@
+
+- name: install dependencies
+  package:
+    name: "{{item}}"
+    state: present
+  with_list:
+    - python
+    - python-pip
+    - python-virtualenv
+    - supervisor
+
+- name: "Clone cdNgine repository"
+  git:
+    repo: 'git@github.com:fr6nco/cdNgine.git'
+    dest: /opt/cdNgine
+    update: yes
+    version: master
+    accept_hostkey: yes
+  notify: restart supervisor
+
+- name: 'Install requirements for cdNgine'
+  pip:
+    requirements: /opt/cdNgine/requirements.txt
+    virtualenv: /opt/cdNgine-venv
+    virtualenv_python: python2.7
+  notify: restart supervisor
+
+- name: 'Create cdNgine database file'
+  copy:
+    content: "{{cdngineobj | to_nice_json }}"
+    dest: /opt/cdNgine/config/database.json
+  notify: restart supervisor
+
+- name: "Prepare supervisord file for cdNgine"
+  copy:
+    src: cdngine.conf
+    dest: /etc/supervisor/conf.d/cdngine.conf
+  notify: restart supervisor
+

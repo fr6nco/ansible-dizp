@@ -1,0 +1,55 @@
+
+- name: install dependencies
+  package:
+    name: apache2
+    state: present
+
+- name: "Check if first deployment was done already"
+  stat:
+    path: /var/www/deployed
+  register: deployed
+
+- name: empty folder
+  file:
+    state: absent
+    path: /var/www/html
+  when: deployed.stat.exists == False
+
+- name: recreate it
+  file:
+    state: directory
+    path: /var/www/html
+    owner: www-data
+  when: deployed.stat.exists == False
+
+- name: "Clone dizp-origin repository"
+  git:
+    repo: 'git@github.com:fr6nco/dizp_origin.git'
+    dest: /var/www/html
+    update: yes
+    version: master
+    accept_hostkey: yes
+
+- name: "Set owner www-data on /var/www/html"
+  file:
+    dest: /var/www/html
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: "Create deployed file"
+  copy:
+    content: ""
+    dest: /var/www/deployed
+    force: no
+    group: www-data
+    owner: www-data
+    mode: 0755
+
+- name: "Create config file for apache"
+  template:
+    src: 000-default.conf
+    dest: /etc/apache2/sites-available/000-default.conf
+    mode: 0644
+  notify: reload webserver
+

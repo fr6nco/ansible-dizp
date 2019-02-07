@@ -1,0 +1,58 @@
+
+
+- name: Install the gpg key for nodejs LTS
+  apt_key:
+    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+    state: present
+
+- name: Install the nodejs LTS repos
+  apt_repository:
+    repo: "deb https://deb.nodesource.com/node_{{ NODEJS_VERSION }}.x {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+
+- name: Install the nodejs
+  apt:
+    name: nodejs
+    state: present
+
+- name: Install gulp and pm2 globally
+  npm:
+    name: "{{item}}"
+    global: yes
+  with_items:
+    - pm2
+    - gulp-cli
+
+- name: "Clone reqNRouter repository"
+  git:
+    repo: 'git@github.com:fr6nco/reqNRouter.git'
+    dest: /opt/reqNRouter
+    update: yes
+    version: master
+    accept_hostkey: yes
+
+- name: Install NPM dependencies
+  npm:
+    path: /opt/reqNRouter
+
+- name: Create reqNRouter config file
+  template:
+    src: config.default.json
+    dest: /opt/reqNRouter/src/config/default.json
+
+- name: Build sources
+  command: gulp
+  args:
+    chdir: /opt/reqNRouter
+
+- name: "Create ecosystem file"
+  template:
+    src: ecosystem.config.js.j2
+    dest: /opt/reqNRouter/dist/ecosystem.config.js
+    mode: 0644
+
+- name: "Start reqNRouter"
+  command: "pm2 startOrReload ecosystem.config.js --watch"
+  args:
+    chdir: /opt/reqNRouter/dist
