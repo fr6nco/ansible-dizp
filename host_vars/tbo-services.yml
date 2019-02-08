@@ -1,8 +1,11 @@
 ns_role: "master"
-ansible_host: "192.168.56.6"
+ansible_host: "10.9.1.11"
 
-## DNS config
-dns_listen: "192.168.56.6"
+## DNS config, # TODO add 10.11.0.99
+dns_listen: 
+  - "10.9.1.11"
+  - "10.11.0.99"
+
 ns_zones:
   # dizp.bt
   - name: dizp.bt
@@ -12,11 +15,11 @@ ns_zones:
       - name: services
         origin: dizp.bt
         records:
-          - { name: dns, type: a, value: 10.11.0.5 }
-          - { name: rr, type: a, value: 10.11.0.5}
-          - { name: se1, type: a, value: 10.11.0.2 }
-          - { name: se2, type: a, value: 10.11.0.3 }
-          - { name: origin, type: a, value: 10.11.0.2 }
+          - { name: dns, type: a, value: 10.11.0.99 }
+          - { name: rr, type: a, value: 10.11.0.100}
+          - { name: se1.cdn, type: a, value: 10.11.0.11 }
+          - { name: se2.cdn, type: a, value: 10.11.0.12 }
+          - { name: origin, type: a, value: 10.11.0.99 }
           - { name: www, type: cname, value: origin }
           - { name: cdn, type: cname, value: rr }
 
@@ -25,8 +28,8 @@ ns_forwarders:
   - 8.8.4.4
 ns_recursion_trusted:
   - 10.11.0.0/24
+  - 10.9.1.0/24
 custom_ansible_managed: "This file is managed by ansible. Do not modify by hand."
-
 
 ## Origin variables
 domain_name: origin.dizp.bt
@@ -35,32 +38,31 @@ aliases:
   - cdn.dizp.bt
 sever_admin: tomas.boros92@gmail.com
 
-
 ## cdNgine database file
 cdngineobj:
   cdngine:
     nodes:
       - name: "rr1"
-        ip: "10.11.0.5"
+        ip: "10.11.0.100"
         port: 8082
         type: "rr"
         datapath_id: null
         port_id: null
         domain: cdn.dizp.bt
       - name: "se1"
-        ip: "10.11.0.2"
+        ip: "10.11.0.11"
         port: 80
         type: "se"
         datapath_id: null
         port_id: null
         domain: "se1.cdn.dizp.bt"
-      - name: "se2"
-        ip: "10.11.0.3"
-        port: 80
-        type: "se"
-        datapath_id: null
-        port_id: null
-        domain: "se2.cdn.dizp.bt"
+      # - name: "se2"
+      #   ip: "10.11.0.12"
+      #   port: 80
+      #   type: "se"
+      #   datapath_id: null
+      #   port_id: null
+      #   domain: "se2.cdn.dizp.bt"
 
 
 

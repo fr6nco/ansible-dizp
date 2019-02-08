@@ -12,13 +12,13 @@
   - common/linux-server
   - common/ntp
 
-- hosts: services
+- hosts: tbo-services
   roles:
     - ns-authoritative
     - origin
     - controller
 
-- hosts: rr
+- hosts: tbo-rr
   roles:
     - reqnrouter
     - frontend

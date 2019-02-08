@@ -1,9 +1,9 @@
 #example ansible_ssh_pass=password ask_sudo_pass=Yes ansible_sudo_pass=password
 
-[dizp]
-services ansible_ssh_extra_args=-A
-rr ansible_ssh_extra_args=-A
-
-
 [ctrgn]
 tbo-mn ansible_ssh_extra_args=-A
+tbo-services ansible_ssh_extra_args=-A
+tbo-rr ansible_ssh_extra_args=-A
+
+[dns]
+tbo-services ansible_ssh_extra_args=-A

@@ -13,7 +13,7 @@
         "se_connection_limit": {{connection_limit}}
     },
     "logging": {
-        "level": "info"
+        "level": "{{loggin_level}}"
     },
     "api": {
         "port": 3000

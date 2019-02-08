@@ -1,5 +1,0 @@
-# installs Apache and deploys the basic dizp cdn webapp
-
-- hosts: services
-  roles:
-    - origin

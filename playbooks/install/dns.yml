@@ -1,5 +1,0 @@
-# Install dns
-
-- hosts: services
-  roles:
-    - ns-authoritative

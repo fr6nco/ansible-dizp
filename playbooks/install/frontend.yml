@@ -1,3 +1,0 @@
-- hosts: rr
-  roles:
-    - frontend

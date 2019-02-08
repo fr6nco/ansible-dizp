@@ -22,10 +22,10 @@ options {
 
     auth-nxdomain no;
     listen-on-v6 { any; };
-    listen-on { 127.0.0.1; {{ dns_listen }}; };
+    listen-on { 127.0.0.1; {{ dns_listen | join("; ") }}; };
 
-    notify-source {{ dns_listen }};
-    transfer-source {{ dns_listen }};
+    notify-source {{ ansible_host }};
+    transfer-source {{ ansible_host }};
 };
 
 statistics-channels {

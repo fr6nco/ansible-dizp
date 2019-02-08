@@ -1,10 +1,11 @@
 NODEJS_VERSION: 10
-listen_ip: 192.168.56.6
+listen_ip: 10.11.0.100
 listen_port: 8082
 domain: "cdn.dizp.bt"
-connector_ip: 192.168.56.6
+connector_ip: 10.9.1.11
 connector_port: 8080
-connection_limit: 3
+connection_limit: 20
+loggin_level: "error"
 
 # Frontend variables
 fe_domain_name: fe.dizp.bt
