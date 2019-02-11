@@ -4,6 +4,16 @@
 tbo-mn ansible_ssh_extra_args=-A
 tbo-services ansible_ssh_extra_args=-A
 tbo-rr ansible_ssh_extra_args=-A
+tbo-se1 ansible_ssh_extra_args=-A
+tbo-se2 ansible_ssh_extra_args=-A
+tbo-client1 ansible_ssh_extra_args=-A
 
 [dns]
 tbo-services ansible_ssh_extra_args=-A
+
+[se]
+tbo-se1 ansible_ssh_extra_args=-A
+tbo-se2 ansible_ssh_extra_args=-A
+
+[client]
+tbo-client1 ansible_ssh_extra_args=-A

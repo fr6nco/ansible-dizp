@@ -22,3 +22,11 @@
   roles:
     - reqnrouter
     - frontend
+
+- hosts: se
+  roles:
+    - serviceengine
+
+- hosts: client
+  roles:
+    - client

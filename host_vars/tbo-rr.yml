@@ -6,6 +6,8 @@ connector_ip: 10.9.1.11
 connector_port: 8080
 connection_limit: 20
 loggin_level: "error"
+get_matching_sess_retries: 30
+get_matching_sess_retry_delay: 500
 
 # Frontend variables
 fe_domain_name: fe.dizp.bt

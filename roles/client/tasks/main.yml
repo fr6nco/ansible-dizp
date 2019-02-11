@@ -1,0 +1,18 @@
+
+
+- name: install firefox
+  package:
+    name: firefox
+    state: present
+
+- name: install ab
+  package:
+    name: apache2-utils
+    state: present
+
+- name: enable X11 forwarding in ssh
+  replace:
+    path: /etc/ssh/sshd_config
+    regexp: "^X11Forwarding no$"
+    replace: "X11Forwarding yes"
+

@@ -1,0 +1,4 @@
+
+- hosts: client
+  roles:
+    - client

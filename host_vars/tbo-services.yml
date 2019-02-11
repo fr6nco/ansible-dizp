@@ -56,13 +56,13 @@ cdngineobj:
         datapath_id: null
         port_id: null
         domain: "se1.cdn.dizp.bt"
-      # - name: "se2"
-      #   ip: "10.11.0.12"
-      #   port: 80
-      #   type: "se"
-      #   datapath_id: null
-      #   port_id: null
-      #   domain: "se2.cdn.dizp.bt"
+      - name: "se2"
+        ip: "10.11.0.12"
+        port: 80
+        type: "se"
+        datapath_id: null
+        port_id: null
+        domain: "se2.cdn.dizp.bt"
 
 
 

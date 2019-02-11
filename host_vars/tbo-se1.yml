@@ -1,0 +1,2 @@
+nginx_domain: "se1.cdn.dizp.bt"
+nginx_listen_ip: 10.11.0.11

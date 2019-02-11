@@ -1,0 +1,30 @@
+
+- name: install nginx
+  package:
+    name: nginx
+    state: present
+
+- name: Create directory /var/www
+  file:
+    path: /var/www
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: remove default nginx config
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: create config file for cdn
+  template:
+    src: cdn.conf
+    dest: /etc/nginx/sites-available/cdn.conf
+  notify: reload nginx
+
+- name: "Create symlink to the sites-enabled"
+  file:
+    dest: /etc/nginx/sites-enabled/cdn.conf
+    src: /etc/nginx/sites-available/cdn.conf
+    state: link
+  notify: reload nginx
