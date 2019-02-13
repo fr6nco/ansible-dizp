@@ -4,6 +4,31 @@
     name: apache2
     state: present
 
+- name: enable expires module
+  apache2_module:
+    state: present
+    name: expires
+  notify: reload webserver
+
+- name: enable headers module
+  apache2_module:
+    state: present
+    name: headers
+  notify: reload webserver
+
+- name: set expires conf file
+  copy:
+    src: expires.conf
+    dest: /etc/apache2/mods-available/expires.conf
+  notify: reload webserver
+
+- name: "Create symlink to the mods enabled for expires.conf"
+  file:
+    dest: /etc/apache2/mods-enabled/expires.conf
+    src: /etc/apache2/mods-available/expires.conf
+    state: link
+  notify: reload webserver
+
 - name: "Check if first deployment was done already"
   stat:
     path: /var/www/deployed
@@ -29,6 +54,22 @@
     update: yes
     version: master
     accept_hostkey: yes
+
+- name: "Create directory for large file storage"
+  file:
+    state: directory
+    path: /var/www/html/assets/largefiles
+    owner: www-data
+
+- name: "check if 1GB file exists in largefiles"
+  stat:
+    path: /var/www/html/assets/largefiles/1GB.zip
+  register: largefile
+
+- name: "download large file with wget"
+  get_url:
+    url: http://ipv4.download.thinkbroadband.com/1GB.zip
+    dest: /var/www/html/assets/largefiles/1GB.zip
 
 - name: "Set owner www-data on /var/www/html"
   file:

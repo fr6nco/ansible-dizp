@@ -50,6 +50,14 @@
     dest: /opt/reqNRouter/dist/ecosystem.config.js
     mode: 0644
 
+- name: sysctl hardening 
+  sysctl:
+     name: "net.ipv4.ip_local_port_range"
+     value: "1024 65535"
+     sysctl_set: yes
+     reload: yes
+     state: present
+
 - name: "Start reqNRouter"
   command: "pm2 startOrReload ecosystem.config.js --watch"
   args:
