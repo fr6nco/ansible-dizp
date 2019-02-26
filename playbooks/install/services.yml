@@ -1,5 +1,5 @@
 - hosts: tbo-services
   roles:
-    # - ns-authoritative
+    - ns-authoritative
     - origin
-    # - controller
+    - controller
