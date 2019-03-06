@@ -1,4 +1,5 @@
 - hosts: tbo-rr
   roles:
     - reqnrouter
+    - reqnrouter302
     - frontend

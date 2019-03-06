@@ -1,0 +1,15 @@
+{
+    "http": {
+        "host": "{{listen_ip}}",
+        "port": {{listen_port_302}},
+        "domain": "{{domain_302}}"
+    },
+    "connector": {
+        "ip": "{{connector_ip}}",
+        "port": {{connector_port}},
+        "url": "cdnhandler/ws"
+    },
+    "logging": {
+        "level": "debug"
+    }
+}

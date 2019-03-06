@@ -1,7 +1,9 @@
 NODEJS_VERSION: 10
 listen_ip: 10.11.0.100
 listen_port: 8082
+listen_port_302: 8080
 domain: "cdn.dizp.bt"
+domain_302: "cdn.dizp.bt"
 connector_ip: 10.9.1.11
 connector_port: 8080
 connection_limit: 20
