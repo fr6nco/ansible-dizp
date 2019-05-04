@@ -12,7 +12,8 @@
     "request_router": {
         "se_connection_limit": {{connection_limit}},
         "get_matching_sess_retries": {{get_matching_sess_retries}},
-        "get_matching_sess_retry_delay": {{get_matching_sess_retry_delay}}
+        "get_matching_sess_retry_delay": {{get_matching_sess_retry_delay}},
+        "keepalive": {{keepalive | lower}}
     },
     "logging": {
         "level": "{{loggin_level}}"

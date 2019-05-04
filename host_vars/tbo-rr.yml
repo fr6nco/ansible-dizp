@@ -10,6 +10,12 @@ connection_limit: 20
 loggin_level: "error"
 get_matching_sess_retries: 30
 get_matching_sess_retry_delay: 500
+keepalive: true
+
+nginx_listen_ip: 10.11.0.100
+nginx_domain: cdn.dizp.bt
+nginx_proxy_domain_se1: se1.cdn.dizp.bt:8080
+nginx_proxy_domain_se2: se2.cdn.dizp.bt:8080
 
 # Frontend variables
 fe_domain_name: fe.dizp.bt

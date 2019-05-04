@@ -1,2 +1,2 @@
-nginx_domain: "se2.cdn.dizp.bt"
+nginx_domain: "se2.cdn.dizp.bt cdn.dizp.bt:8082 cdn.dizp.bt"
 nginx_listen_ip: 10.11.0.12

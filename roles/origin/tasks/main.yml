@@ -71,6 +71,11 @@
     url: http://ipv4.download.thinkbroadband.com/1GB.zip
     dest: /var/www/html/assets/largefiles/1GB.zip
 
+- name: "Download medium file with wget"
+  get_url:
+    url: http://ipv4.download.thinkbroadband.com/100MB.zip
+    dest: /var/www/html/assets/largefiles/100MB.zip
+
 - name: "Set owner www-data on /var/www/html"
   file:
     dest: /var/www/html
